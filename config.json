@@ -1,0 +1,5 @@
+{ 
+    "xlsxFile": "./test.xlsx",
+	"dir": "./exam",
+	"fileExt": ".c"
+}
