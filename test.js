@@ -15,16 +15,18 @@ try {
 		console.log((xlsxFile + ' not exist. Please check config file or make sure that file at the right location.').red);
 		exit();
 	}
+	fs.writeFileSync('./exam/emptyExamLog.txt', '');
 	workbook.xlsx.readFile(xlsxFile)
 		.then(function() {
 			var worksheet = workbook.getWorksheet('Sheet1');
 			worksheet.eachRow({ includeEmpty: false }, function(row, rowNumber) {
-			  if(rowNumber != 1)
-			  {
-				let mssv = row.values[1];
-				let content = [row.values[2],row.values[3]];
-				writeCFile(mssv, content);
-			  }
+				// console.log("Row " + rowNumber + " = " + JSON.stringify(row.values));
+				if(rowNumber != 1)
+				{
+					let mssv = row.values[1];
+					let content = [row.values[2],row.values[3]];
+					writeCFile(mssv, content);
+				}
 			});
 		});
   } catch(err) {
@@ -43,10 +45,15 @@ function writeCFile(mssv, content){
 	let i = 1;
 	content.forEach(exam => {
 		let output = studentFolderDir + '/cau' + i + fileExt;
-		fs.writeFile(output, exam, function (err) {
-			if (err) return console.log(('Error' + err).red);
-			console.log((mssv + ' > '+ output).green);
-		  });
+		if(exam === undefined){
+			console.log((mssv + ' > '+ output + ' Empty ').red);
+			fs.appendFileSync('./exam/emptyExamLog.txt', mssv + ' > '+ output + '\n');
+		}else{
+			fs.writeFile(output, exam, function (err) {
+				if (err) return console.log(('Error' + err).red);
+				console.log((mssv + ' > '+ output).green);
+			});
+		}
 		i++;
 	});
 }
